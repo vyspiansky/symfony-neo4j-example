@@ -21,6 +21,6 @@ It uses the graphaware bundles
 Run built-in web server
 --------------
 
-```$ cd ~/Web/symfony-neo4j-example/web```
+```$ cd /path/to/project/web```
 
 ```$ php -S localhost:8000 app_dev.php```
