@@ -16,11 +16,19 @@ variables in app/config/parameters.yml. These are the "default values".
   * neo4j-user: neo4j
   * neo4j-pass: your-password
 
-It uses the graphaware bundles
+It uses the graphaware bundles.
 
-Run built-in web server
+Easiest way to play with the example
 --------------
+
+a) Go to the web folder of the project
 
 ```$ cd /path/to/project/web```
 
+b) Run a built-in web server
+
 ```$ php -S localhost:8000 app_dev.php```
+
+c) Visit http://localhost:8000/admin/user
+
+Note! Neo4j server must be runned.
