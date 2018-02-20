@@ -3,6 +3,8 @@ Symfony Example using neo4j
 
 This is a simple example of using Neo4j with symfony2.8.
 
+Original repository - https://github.com/Margaferrez/symfony-neo4j-example
+
 Setup
 --------------
 
@@ -16,9 +18,7 @@ variables in app/config/parameters.yml. These are the "default values".
 
 It uses the graphaware bundles
 
-You can find other information in my blog -> [mentatik.com](http://mentatik.com/blog/)
-
-Run Built-in web server
+Run built-in web server
 --------------
 
 ```$ cd ~/Web/symfony-neo4j-example/web```
