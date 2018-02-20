@@ -21,5 +21,5 @@ You can find other information in my blog -> [mentatik.com](http://mentatik.com/
 Run Built-in web server
 --------------
 
-$ cd ~/Web/symfony-neo4j-example/web
-$ php -S localhost:8000 app_dev.php
+```$ cd ~/Web/symfony-neo4j-example/web```
+```$ php -S localhost:8000 app_dev.php```
