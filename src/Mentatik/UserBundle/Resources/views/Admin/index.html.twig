@@ -1,0 +1,24 @@
+<h1>Manage your users</h1>
+
+<p><a href="{{ path('mentatik_user_admin_insert') }}">Add new user +</a></p>
+
+<table>
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Actions</th>
+    </tr>
+{% for user in user_list %}
+    <tr>
+
+        <td> {{ user.id }} </td>
+        <td> {{ user.name }} </td>
+        <td> {{ user.email }} </td>
+        <td>
+            <a href="{{ path('mentatik_user_admin_update', {'id': user.id}) }}">Edit</a>
+            <a href="{{ path('mentatik_user_admin_delete', {'id': user.id}) }}">Delete</a>
+        </td>
+    </tr>
+{% endfor %}
+</table>

@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="graph_entitymanager" class="GraphAware\Neo4j\OGM\EntityManager">
+            <factory class="GraphAware\Neo4j\OGM\EntityManager"  method="create" />
+            <argument>http://%neo4j-user%:%neo4j-pass%@%neo4j-host%:%neo4j-port%</argument>
+        </service>
+
+        <service id="mentatik_user.admin_controller" class="Mentatik\UserBundle\Controller\AdminController">
+            <argument type="service" id="templating" />
+            <argument type="service" id="graph_entitymanager" />
+            <argument type="service" id="form.factory" />
+            <argument type="service" id="router" />
+        </service>
+    </services>
+
+</container>

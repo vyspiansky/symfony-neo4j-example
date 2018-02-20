@@ -1,0 +1,3 @@
+mentatik_user:
+    resource: "@MentatikUserBundle/Controller"
+    type:     annotation
