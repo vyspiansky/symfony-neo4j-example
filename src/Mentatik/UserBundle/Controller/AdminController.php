@@ -7,6 +7,7 @@ use GraphAware\Neo4j\OGM\EntityManager;
 use GraphAware\Neo4j\OGM\Tests\Integration\Model\Repository;
 use Mentatik\UserBundle\Form\UserType;
 use Mentatik\UserBundle\Model\User;
+use Mentatik\UserBundle\Model\Ship;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Form;
@@ -70,8 +71,16 @@ class AdminController
     public function indexAction()
     {
         $user_list = $this->userRepository->findAll();
+
+        /*
+        foreach ($person->getMovies() as $movie) {
+            echo sprintf("    -- %s\n", $movie->getTitle());
+        }
+        */
+
         return $this->templating->renderResponse('MentatikUserBundle:Admin:index.html.twig',
-            array('user_list'=> $user_list));
+            array('user_list' => $user_list)
+        );
     }
 
     /**
@@ -83,6 +92,20 @@ class AdminController
     public function insertAction(Request $request)
     {
         $user = new User();
+
+
+        // dummy code - this is here just so that the Task has some tags
+        // otherwise, this isn't an interesting example
+        $ship1 = new Ship();
+        $ship1->setTitle('Ship #01');
+        $user->getShips()->add($ship1);
+
+        $ship2 = new Ship();
+        $ship2->setTitle('Ship #02');
+        $user->getShips()->add($ship2);
+        // end dummy code
+
+
         $form = $this->createUserForm($user, 'Create');
 
         if ($request->getMethod() == 'POST') {
@@ -116,11 +139,12 @@ class AdminController
     /**
      * @Route("/user/{id}/delete", name="mentatik_user_admin_delete" )
      * @param integer $id
-     * @Method({"DELETE"})
+     * @Method({"GET"})
      * @return Response
      */
     public function deleteAction($id)
     {
+        // TODO: DELETE Method must be instead of GET
         $user = $this->userRepository->findOneById((int)$id);
         $this->em->remove($user);
         $this->em->flush();
@@ -136,7 +160,7 @@ class AdminController
         return $form;
     }
 
-    private function save_user_from_form(Request $request,Form $form)
+    private function save_user_from_form(Request $request, Form $form)
     {
         $form->handleRequest($request);
 

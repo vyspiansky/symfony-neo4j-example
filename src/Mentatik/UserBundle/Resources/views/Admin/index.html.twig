@@ -2,10 +2,11 @@
 
 <p><a href="{{ path('mentatik_user_admin_insert') }}">Add new user +</a></p>
 
-<table>
+<table border="1" cellpadding="10" cellspacing="0">
     <tr>
         <th>Id</th>
         <th>Name</th>
+        <th>Ships</th>
         <th>Email</th>
         <th>Actions</th>
     </tr>
@@ -14,6 +15,11 @@
 
         <td> {{ user.id }} </td>
         <td> {{ user.name }} </td>
+        <td>
+            {% for ship in user.ships %}
+                <div>{{ ship.id }} - {{ ship.title }}</div>
+            {% endfor %}
+        </td>
         <td> {{ user.email }} </td>
         <td>
             <a href="{{ path('mentatik_user_admin_update', {'id': user.id}) }}">Edit</a>
@@ -22,3 +28,11 @@
     </tr>
 {% endfor %}
 </table>
+
+<hr>
+<p>
+    <small>
+        The GraphAware Neo4j PHP OGM Documentation is available on
+        <a href="http://neo4j-php-ogm.readthedocs.io/en/latest/" target="_blank">ReadTheDocs</a>.
+    </small>
+</p>

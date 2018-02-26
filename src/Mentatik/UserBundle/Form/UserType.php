@@ -7,6 +7,11 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+
+// use Mentatik\UserBundle\Model\Ship;
+use Mentatik\UserBundle\Model\User;
 
 class UserType extends AbstractType
 {
@@ -24,14 +29,45 @@ class UserType extends AbstractType
                     'constraints' => new Length(['max' => 300]),
                     'required' => true,
                 ]
-            );
+            )
+//            ->add(
+//                'shipsCollection', 'ShipType',
+//                [
+//                    'class' => 'Ship',
+//                    'property' => 'title',
+//                    'multiple' => TRUE,
+//                    'expanded' => TRUE,
+//                    'label' => 'Ships',
+//                    // 'disabled' => !$this->loggedInUser->isAdmin(),
+//                ]
+//            )
+
+            ->add('ships', CollectionType::class, array(
+                'entry_type' => ShipType::class,
+                'entry_options' => array('label' => false),
+                //'allow_add' => true,
+            ))
+
+        ;
     }
     /**
      * @return string
      */
-    public function getBlockPrefix()
+//    public function getBlockPrefix()
+//    {
+//        return 'User';
+//    }
+
+    /**
+     * Configures the options for this type.
+     *
+     * @param OptionsResolver $resolver The resolver for the options
+     */
+    public function configureOptions(OptionsResolver $resolver)
     {
-        return 'User';
+        $resolver->setDefaults(array(
+            'data_class' => User::class,
+        ));
     }
 
 }
