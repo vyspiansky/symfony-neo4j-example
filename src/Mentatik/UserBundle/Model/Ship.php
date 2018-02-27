@@ -74,4 +74,11 @@ class Ship
         return $this->users;
     }
 
+    public function addUser(User $user)
+    {
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+        }
+    }
+
 }

@@ -1,33 +1,35 @@
-<h1>Manage your users</h1>
+<h1>Dashboard</h1>
 
-<p><a href="{{ path('mentatik_user_admin_insert') }}">Add new user +</a></p>
+<p><a href="{{ path('mentatik_user_admin_insert') }}">Add new +</a></p>
 
-<table border="1" cellpadding="10" cellspacing="0">
-    <tr>
-        <th>Id</th>
-        <th>Name</th>
-        <th>Ships</th>
-        <th>Email</th>
-        <th>Actions</th>
-    </tr>
-{% for user in user_list %}
-    <tr>
+{% if user_list is not empty %}
+    <table border="1" cellpadding="10" cellspacing="0">
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Ships</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+    {% for user in user_list %}
+        <tr>
 
-        <td> {{ user.id }} </td>
-        <td> {{ user.name }} </td>
-        <td>
-            {% for ship in user.ships %}
-                <div>{{ ship.id }} - {{ ship.title }}</div>
-            {% endfor %}
-        </td>
-        <td> {{ user.email }} </td>
-        <td>
-            <a href="{{ path('mentatik_user_admin_update', {'id': user.id}) }}">Edit</a>
-            <a href="{{ path('mentatik_user_admin_delete', {'id': user.id}) }}">Delete</a>
-        </td>
-    </tr>
-{% endfor %}
-</table>
+            <td> {{ user.id }} </td>
+            <td> {{ user.name }} </td>
+            <td>
+                {% for ship in user.ships %}
+                    <div>{{ ship.id }} - {{ ship.title }}</div>
+                {% endfor %}
+            </td>
+            <td> {{ user.email }} </td>
+            <td>
+                <a href="{{ path('mentatik_user_admin_update', {'id': user.id}) }}">Edit</a>
+                <a href="{{ path('mentatik_user_admin_delete', {'id': user.id}) }}">Delete</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endif %}
 
 <hr>
 <p>

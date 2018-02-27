@@ -19,6 +19,8 @@ use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as Templating;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
+use GraphAware\Neo4j\OGM\Common\Collection;
+
 
 /**
  * @Route("/admin", service="mentatik_user.admin_controller" )
@@ -34,6 +36,11 @@ class AdminController
      * @var Repository
      */
     private $userRepository;
+
+    /**
+     * @var Repository
+     */
+    private $shipRepository;
 
     /**
      * @var Templating
@@ -60,6 +67,7 @@ class AdminController
         $this->templating = $templating;
         $this->em = $graphEntityManager;
         $this->userRepository = $this->em->getRepository(User::class);
+        $this->shipRepository = $this->em->getRepository(Ship::class);
         $this->formFactory = $formFactory;
         $this->router = $router;
     }
@@ -94,26 +102,51 @@ class AdminController
         $user = new User();
 
 
-        // dummy code - this is here just so that the Task has some tags
+        // dummy code - this is here just so that the User has some ships
         // otherwise, this isn't an interesting example
-        $ship1 = new Ship();
-        $ship1->setTitle('Ship #01');
-        $user->getShips()->add($ship1);
-
-        $ship2 = new Ship();
-        $ship2->setTitle('Ship #02');
-        $user->getShips()->add($ship2);
+//        $ship1 = new Ship();
+//        $ship1->setTitle('Ship #01');
+//        $user->getShips()->add($ship1);
+//
+//        $ship2 = new Ship();
+//        $ship2->setTitle('Ship #02');
+//        $user->getShips()->add($ship2);
         // end dummy code
 
 
         $form = $this->createUserForm($user, 'Create');
 
         if ($request->getMethod() == 'POST') {
-            return $this->save_user_from_form($request, $form);
+            //return $this->save_user_from_form($request, $form, new Collection());
+
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+
+                $user = $form->getData();
+
+//                foreach ($user->getShips() as $ship) {
+//                    echo $ship->getTitle() . '<br>';
+//
+//                    /** @var Ship $ship */
+//                    $ship = $this->shipRepository->findOneBy(['title' => $ship->getTitle()]);
+//
+//
+//                    $user->getShips()->add($ship);
+//                    $ship->getUsers()->add($user);
+//                }
+
+                $this->em->persist($user);
+                $this->em->flush();
+            }
+            return new RedirectResponse($this->router->generate('mentatik_user_admin_list'));
         }
 
         return $this->templating->renderResponse('MentatikUserBundle:Admin:form.html.twig',
-            array('form'=> $form->createView()));
+            array(
+                'form' => $form->createView()
+            )
+        );
     }
 
     /**
@@ -126,14 +159,92 @@ class AdminController
     public function updateAction(Request $request, $id)
     {
         $user = $this->userRepository->findOneById((int)$id);
-        $form = $this->createUserForm($user, 'Update');
 
-        if ($request->getMethod() == 'POST') {
-            return $this->save_user_from_form($request, $form);
+        if (!$user) {
+            throw $this->createNotFoundException('No user found for id ' . $id);
         }
 
-        return $this->templating->renderResponse('MentatikUserBundle:Admin:form.html.twig',
-            array('form'=> $form->createView()));
+        // $originalShips = new ArrayCollection();
+        $originalShips = new Collection();
+
+        foreach ($user->getShips() as $ship) {
+            $originalShips->add($ship);
+        }
+
+        $form = $this->createUserForm($user, 'Update');
+
+
+//        $editForm = $this->createForm(TaskType::class, $task);
+//        $editForm->handleRequest($request);
+
+
+        if ($request->getMethod() == 'POST') {
+            // return $this->save_user_from_form($request, $form, $originalShips);
+
+
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+
+//                foreach ($user->getShips() as $ship) {
+//                    $ship->getUsers()->removeElement($user);
+//                }
+//                $user->getShips()->clear();
+                //$this->em->remove($user);
+
+
+                //$user = $this->userRepository->findOneById((int)$id);
+
+
+                // remove the relationship between the Ship and the User
+                foreach ($originalShips as $ship) {
+
+                    if (false === $user->getShips()->contains($ship)) {
+
+                        $user->getShips()->removeElement($ship);
+
+                        //var_dump($user->getShips());
+
+                        // remove the User from the Ship
+                        $ship->getUsers()->removeElement($user);
+
+                        //$actor->getMovies()->removeElement($movie);
+                        //$movie->getActors()->removeElement($actor);
+                        //$entityManager->flush();
+
+                        // if it was a many-to-one relationship, remove the relationship like this
+                        // $ship->setUser(null);
+
+                        $this->em->persist($ship);
+                        //$this->em->flush();
+
+                        // if you wanted to delete the Ship entirely, you can also do that
+                        // $em->remove($ship);
+                    }
+                }
+
+                // $user = $form->getData();
+                $this->em->persist($user);
+                $this->em->flush();
+
+
+                //$this->em->remove($user);
+                //$this->em->flush();
+            }
+
+//            die();
+
+            return new RedirectResponse($this->router->generate('mentatik_user_admin_list'));
+
+
+        }
+
+        return $this->templating->renderResponse(
+            'MentatikUserBundle:Admin:form.html.twig',
+            array(
+                'form' => $form->createView()
+            )
+        );
     }
 
     /**
@@ -146,6 +257,14 @@ class AdminController
     {
         // TODO: DELETE Method must be instead of GET
         $user = $this->userRepository->findOneById((int)$id);
+
+
+        foreach ($user->getShips() as $ship) {
+            $ship->getUsers()->removeElement($user);
+        }
+        $user->getShips()->clear();
+        //$this->em->remove($user);
+
         $this->em->remove($user);
         $this->em->flush();
         return new RedirectResponse($this->router->generate('mentatik_user_admin_list'));
@@ -160,15 +279,15 @@ class AdminController
         return $form;
     }
 
-    private function save_user_from_form(Request $request, Form $form)
-    {
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $user = $form->getData();
-            $this->em->persist($user);
-            $this->em->flush();
-        }
-        return new RedirectResponse($this->router->generate('mentatik_user_admin_list'));
-    }
+//    private function save_user_from_form(Request $request, Form $form, $originalShips)
+//    {
+//        $form->handleRequest($request);
+//
+//        if ($form->isSubmitted() && $form->isValid()) {
+//            $user = $form->getData();
+//            $this->em->persist($user);
+//            $this->em->flush();
+//        }
+//        return new RedirectResponse($this->router->generate('mentatik_user_admin_list'));
+//    }
 }

@@ -45,7 +45,9 @@ class UserType extends AbstractType
             ->add('ships', CollectionType::class, array(
                 'entry_type' => ShipType::class,
                 'entry_options' => array('label' => false),
-                //'allow_add' => true,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
             ))
 
         ;

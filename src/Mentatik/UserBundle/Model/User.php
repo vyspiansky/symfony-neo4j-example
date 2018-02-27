@@ -95,4 +95,16 @@ class User
     {
         return $this->ships;
     }
+
+    public function addShip(Ship $ship)
+    {
+        $ship->addUser($this);
+
+        $this->ships->add($ship);
+    }
+
+    public function removeShip(Ship $ship)
+    {
+        $this->ships->removeElement($ship);
+    }
 }

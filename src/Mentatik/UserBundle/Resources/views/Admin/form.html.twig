@@ -1,6 +1,105 @@
-{{ form_start(form, {'attr': {'class': 'my-form-class'} }) }}
-    {{ form_widget(form) }}
+{{ form_start(form) }}
+    {{ form_errors(form) }}
+
+    <h2>Creating a new instance</h2>
+
+    <div style="margin-bottom: 16px;">
+        {{ form_label(form.name) }}
+        {{ form_errors(form.name) }}
+        {{ form_widget(form.name) }}
+    </div>
+
+    <div style="margin-bottom: 16px;">
+        {{ form_label(form.email) }}
+        {{ form_errors(form.email) }}
+        {{ form_widget(form.email) }}
+    </div>
+
+    <h3>Ships</h3>
+
+    <ul class="ships" data-prototype="{{ form_widget(form.ships.vars.prototype)|e('html_attr') }}">
+        {% for ship in form.ships %}
+            <li style="margin-bottom: 16px;">{{ form_row(ship.title) }}</li>
+        {% endfor %}
+    </ul>
 {{ form_end(form) }}
 
 
 <p><a href="{{ path('mentatik_user_admin_list') }}">Back to the list</a></p>
+
+{% block javascripts %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script>
+        var $collectionHolder;
+
+        // setup an "add a ship" link
+        var $addShipLink = $('<a href="#" class="add_ship_link">Add a ship</a>');
+        var $newLinkLi = $('<li style="margin-bottom: 16px;"></li>').append($addShipLink);
+
+        jQuery(document).ready(function() {
+            // Get the ul that holds the collection of ships
+            $collectionHolder = $('ul.ships');
+
+            // add a delete link to all of the existing ship form li elements
+            $collectionHolder.find('li').each(function() {
+                addShipFormDeleteLink($(this));
+            });
+
+            // add the "add a ship" anchor and li to the ships ul
+            $collectionHolder.append($newLinkLi);
+
+            // count the current form inputs we have (e.g. 2), use that as the new
+            // index when inserting a new item (e.g. 2)
+            $collectionHolder.data('index', $collectionHolder.find(':input').length);
+
+            $addShipLink.on('click', function(e) {
+                // prevent the link from creating a "#" on the URL
+                e.preventDefault();
+
+                // add a new ship form (see next code block)
+                addShipForm($collectionHolder, $newLinkLi);
+            });
+        });
+
+        function addShipForm($collectionHolder, $newLinkLi) {
+            // Get the data-prototype explained earlier
+            var prototype = $collectionHolder.data('prototype');
+
+            // get the new index
+            var index = $collectionHolder.data('index');
+
+            var newForm = prototype;
+            // You need this only if you didn't set 'label' => false in your ships field in TaskType
+            // Replace '__name__label__' in the prototype's HTML to
+            // instead be a number based on how many items we have
+            // newForm = newForm.replace(/__name__label__/g, index);
+
+            // Replace '__name__' in the prototype's HTML to
+            // instead be a number based on how many items we have
+            newForm = newForm.replace(/__name__/g, index);
+
+            // increase the index with one for the next item
+            $collectionHolder.data('index', index + 1);
+
+            // Display the form in the page in an li, before the "Add a ship" link li
+            var $newFormLi = $('<li style="margin-bottom: 16px;"></li>').append(newForm);
+            $newLinkLi.before($newFormLi);
+
+            // add a delete link to the new form
+            addShipFormDeleteLink($newFormLi);
+        }
+
+        function addShipFormDeleteLink($shipFormLi) {
+            var $removeFormA = $('<a href="#">delete this ship</a>');
+            $shipFormLi.append($removeFormA);
+
+            $removeFormA.on('click', function(e) {
+                // prevent the link from creating a "#" on the URL
+                e.preventDefault();
+
+                // remove the li for the ship form
+                $shipFormLi.remove();
+            });
+        }
+    </script>
+{% endblock %}
