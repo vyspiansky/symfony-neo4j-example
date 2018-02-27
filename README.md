@@ -1,7 +1,7 @@
 Symfony Example using neo4j
 ===========================
 
-This is a simple example of using Neo4j with symfony2.8.
+This is a simple example of using Neo4j with Symfony 2.8.
 
 Original repository - https://github.com/Margaferrez/symfony-neo4j-example
 
